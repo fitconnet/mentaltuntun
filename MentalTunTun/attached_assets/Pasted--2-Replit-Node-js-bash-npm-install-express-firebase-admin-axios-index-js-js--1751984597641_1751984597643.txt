@@ -1,0 +1,81 @@
+✅ 2단계: Replit에 Node.js 서버 구축
+bash
+복사
+편집
+npm install express firebase-admin axios
+📁 index.js 코드
+js
+복사
+편집
+const express = require("express");
+const admin = require("firebase-admin");
+const axios = require("axios");
+const app = express();
+require("dotenv").config();
+
+admin.initializeApp({
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+  }),
+});
+
+app.use(express.json());
+
+app.post("/api/firebase-token", async (req, res) => {
+  const { provider, token } = req.body;
+  let userInfo;
+
+  try {
+    if (provider === "kakao") {
+      const kakaoRes = await axios.get("https://kapi.kakao.com/v2/user/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      userInfo = kakaoRes.data;
+    } else if (provider === "naver") {
+      const naverRes = await axios.get("https://openapi.naver.com/v1/nid/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      userInfo = naverRes.data.response;
+    }
+
+    const uid = `${provider}:${userInfo.id}`;
+    const firebaseToken = await admin.auth().createCustomToken(uid, {
+      email: userInfo.email || null,
+      nickname: userInfo.nickname || null,
+    });
+
+    res.json({ firebaseToken });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error creating Firebase token");
+  }
+});
+
+app.listen(3000, () => console.log("Server running on port 3000"));
+✅ 3단계: 프론트에서 로그인 연동
+🔹 Kakao 예시
+html
+복사
+편집
+<script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+<script>
+Kakao.init("카카오 자바스크립트 키");
+
+function kakaoLogin() {
+  Kakao.Auth.login({
+    success: function (authObj) {
+      fetch("/api/firebase-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ provider: "kakao", token: authObj.access_token }),
+      })
+        .then((res) => res.json())
+        .then(({ firebaseToken }) => {
+          firebase.auth().signInWithCustomToken(firebaseToken);
+        });
+    },
+  });
+}
+</script>

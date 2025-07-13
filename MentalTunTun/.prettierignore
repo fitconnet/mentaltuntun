@@ -1,0 +1,17 @@
+node_modules
+dist
+.env
+.env.*
+*.log
+.DS_Store
+.vscode
+.idea
+coverage
+*.tsbuildinfo
+.next
+.vercel
+.replit
+*.md
+package-lock.json
+yarn.lock
+pnpm-lock.yaml 

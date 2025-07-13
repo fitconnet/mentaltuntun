@@ -1,0 +1,120 @@
+✅ 목표 기능 요약
+관리자 세션 설정 버튼 클릭
+
+메인 관리자만 인증 가능
+
+서브 관리자는 인증 실패
+
+메인 관리자 인증 완료 후
+
+아이디/비밀번호 수정
+
+서브 관리자 계정 생성/수정/삭제
+
+관리자 대시보드 카테고리별 접근권한 설정
+
+문제
+
+세션 인증은 성공하지만, 인증 후 화면이 전환되지 않음
+
+📌 문제 원인 파악 가이드
+다음 항목들을 하나씩 점검해보자:
+
+1. 세션 인증 후 상태 처리 확인
+isAuthenticated 혹은 authState 같은 변수가 상태로 관리되고 있는지 확인
+
+인증 성공 후 navigate 또는 setScreen() 같은 함수 호출이 제대로 실행되고 있는지 확인
+
+예시:
+
+javascript
+복사
+편집
+if (isAuthenticated && user.role === "mainAdmin") {
+  navigate("/admin-dashboard"); // 혹은 setScreen("admin-dashboard")
+}
+2. 리플릿 이벤트 핸들링 방식 체크
+리플릿은 클라이언트 상태 관리가 리액트처럼 작동하지 않을 수 있음. 인증 로직 이후 화면 전환이 수동 트리거 방식으로 필요한 경우가 있음.
+
+javascript
+복사
+편집
+function onAuthSuccess() {
+  // 인증 상태 업데이트
+  setSession({ user: "admin", role: "mainAdmin", isAuthenticated: true });
+
+  // 화면 전환 명령
+  showScreen("mainAdminDashboard"); // 리플릿에서 정의한 화면 이름
+}
+3. 화면 전환 조건 정확히 확인
+아래와 같이 상태 조건을 충족하는데도 UI가 전환되지 않으면, 렌더링 조건 자체가 잘못됐을 가능성이 높아:
+
+javascript
+복사
+편집
+if (session.isAuthenticated && session.role === "mainAdmin") {
+  return <MainAdminDashboard />;
+} else {
+  return <LoginScreen />;
+}
+🔧 개선 및 구현 지침
+✅ 인증 흐름 리팩토링 구조
+javascript
+복사
+편집
+// 1. 로그인 버튼 클릭
+async function handleLogin(username, password) {
+  const result = await loginAPI(username, password); // 인증 요청
+
+  if (result.success && result.role === "mainAdmin") {
+    setSession({ ...result, isAuthenticated: true });
+    showScreen("MainAdminDashboard");
+  } else {
+    alert("메인 관리자만 인증할 수 있습니다.");
+  }
+}
+✅ 메인 관리자 대시보드 권한 기능
+javascript
+복사
+편집
+// 메인 관리자 전용 대시보드
+function MainAdminDashboard() {
+  return (
+    <div>
+      <h2>메인 관리자 메뉴</h2>
+      <button onClick={editCredentials}>아이디/비밀번호 수정</button>
+      <button onClick={manageSubAdmins}>서브 관리자 관리</button>
+      <button onClick={setAccessRights}>카테고리 접근권한 설정</button>
+    </div>
+  );
+}
+✅ 접근권한 설정 예시
+javascript
+복사
+편집
+function setAccessRights() {
+  const categories = ["상품관리", "회원관리", "통계"];
+  return (
+    <div>
+      {categories.map((cat) => (
+        <div key={cat}>
+          <label>{cat}</label>
+          <select>
+            <option value="none">접근불가</option>
+            <option value="read">읽기</option>
+            <option value="write">쓰기</option>
+          </select>
+        </div>
+      ))}
+    </div>
+  );
+}
+🧪 최종 체크리스트
+ 로그인 후 session 상태가 업데이트되고 있음
+
+ 인증 상태에 따라 화면 전환이 발생하고 있음
+
+ 메인 관리자 외에는 인증을 막고 있음
+
+ 인증 후 UI에서 아이디/비번 수정, 서브관리자 관리, 권한 설정 UI 렌더링이 정상 작동함
+

@@ -1,0 +1,86 @@
+✅ [완료 목표] 감정 카드 저장 + 불러오기 구현
+🎯 1. Firebase 설정 코드 붙이기 (Replit의 index.html 또는 script.js)
+js
+복사
+편집
+// Firebase Web SDK 로드 및 초기화
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "SENDER_ID",
+  appId: "APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+👉 위 값들은 Firebase 콘솔 > 프로젝트 설정 > 웹앱 등록 시 제공된 정보로 교체하세요.
+
+🧩 2. 감정 카드 저장 함수 (버튼 클릭 시 실행)
+js
+복사
+편집
+async function saveEmotionCard() {
+  const emotion = document.getElementById("emotionInput").value;
+  const detail = document.getElementById("detailInput").value;
+
+  try {
+    await addDoc(collection(db, "emotion_logs"), {
+      emotion: emotion,
+      detail: detail,
+      createdAt: new Date()
+    });
+    alert("감정 카드 저장 완료!");
+  } catch (error) {
+    console.error("감정 카드 저장 실패:", error);
+  }
+}
+📥 3. 감정 카드 불러오기 함수
+js
+복사
+편집
+async function loadEmotionCards() {
+  const logsContainer = document.getElementById("logs");
+  logsContainer.innerHTML = "";
+
+  const q = query(collection(db, "emotion_logs"), orderBy("createdAt", "desc"));
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    const card = `<div class="card">
+      <h3>${data.emotion}</h3>
+      <p>${data.detail}</p>
+      <small>${new Date(data.createdAt.seconds * 1000).toLocaleString()}</small>
+    </div>`;
+    logsContainer.innerHTML += card;
+  });
+}
+🖼️ 4. HTML 예시 UI 구성
+html
+복사
+편집
+<input type="text" id="emotionInput" placeholder="기분 (예: 기쁨, 슬픔)">
+<textarea id="detailInput" placeholder="감정 상세 내용을 적어주세요."></textarea>
+<button onclick="saveEmotionCard()">감정 기록 저장</button>
+
+<hr>
+
+<button onclick="loadEmotionCards()">감정 기록 불러오기</button>
+<div id="logs"></div>
+🔒 5. Firestore 보안 규칙 (초기 테스트용)
+js
+복사
+편집
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /emotion_logs/{docId} {
+      allow read, write: if request.auth != null; // 로그인 사용자만 접근 가능
+    }
+  }
+}
+📌 개발 중에는 request.auth == null로 설정 가능하지만 보안상 추천하지 않습니다.

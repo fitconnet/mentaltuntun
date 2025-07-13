@@ -1,0 +1,66 @@
+🧱 [1] 공통 UI 컴포넌트
+이름	설명
+AppBar	상단 타이틀 + 네비게이션 버튼
+BottomTabBar	홈 / 캘린더 / 피드백 / 테스트 / 설정
+KeywordCard	관심사, 감정 등 카드형 선택 UI
+PersonaCard	GPT 상담 페르소나 선택용 카드
+EmotionEmojiSelector	😃 / 😢 등 감정 선택 이모지
+StatCard	감정 변화/상담 분석용 지표 카드
+TestCard	심리 테스트 카드 (썸네일 + 제목 + 설명)
+FeedbackGraph	감정/성향/상담 변화 시각화 차트
+
+🏠 [2] 메인화면
+컴포넌트명	설명
+MainButtonCard	“나는 누구?”, 감정카드, 상담 시작 카드형 버튼
+MainNavigationTab	상단 탭 (홈/카테고리/설정)
+
+🧠 [3] “나는 누구?” 모듈
+컴포넌트명	설명
+InterestCategoryGrid	대주제 키워드 (8개): 예술, 커리어 등
+SubKeywordSelector	소주제 키워드 (예: 음악 → 힙합, 인디 등)
+WorldcupChoice	2개 선택지 토너먼트 버튼
+PersonaSuggestionBox	자아분석 결과 + 상담 스타일 3종 추천
+
+💬 [4] 감정 카드
+컴포넌트명	설명
+EmotionCategorySelector	긍정/부정/혼합/행동 등 범주 선택
+EmotionKeywordPicker	감정 키워드 카드 (다중 선택 가능)
+EmotionRecordCard	당일 감정 저장 + 주간/월간 그래프
+
+🎭 [5] 상담 모듈
+컴포넌트명	설명
+ConsultKeywordSelector	고민 주제 키워드 (ex. 불안, 연애, 꿈 해몽)
+PersonaRecommendationDynamic	자동 분석된 3가지 상담 페르소나 제시
+ChatInterface	GPT 상담 UI (말풍선, 입력창 포함)
+PersonaSwitchButton	상담 중 페르소나 변경용 탭
+
+🧪 [6] 심리 테스트 탭
+컴포넌트명	설명
+TestCategoryToggle	[전문 심리검사 / 흥미 심리테스트] 선택
+TestCardGroup	각 카테고리 내 테스트 카드 나열
+TestQuestionPage	설문 진행용 UI (선다형, 슬라이더 등)
+TestResultSummary	결과 해석 + 상담 연결 버튼
+
+📅 [7] 카테고리 탭
+탭	컴포넌트
+캘린더	CalendarTracker + DailySummaryDialog
+피드백	MonthlyEmotionGraph + InsightBox
+콘텐츠	ContentPreviewCard + BookmarkButton
+운세	FortuneCardGroup (오늘/월/연 사주)
+
+🛠 [8] 설정 탭
+컴포넌트명	설명
+SubscriptionStatusToggle	무료/유료 여부 표시
+ProfileEditorForm	이름, MBTI, 사주, 성향 입력 폼
+PrivacyPolicyLink	개인정보 보호센터
+DeleteAccountButton	탈퇴 기능
+
+🧑‍💼 [9] 관리자 전용 대시보드
+컴포넌트명	설명
+AdminLoginForm	관리자 로그인
+DashboardStatsCard	유저 수, 매출, 유입 수 요약
+ContentUploadPanel	영상, 글 등 콘텐츠 업로드
+UserFeedbackList	사용자 피드백 확인
+RevenueGraph	일/월/누적 매출 그래프
+AdminSettingMenu	공지사항, 점검관리, 사용자 차단 등
+
