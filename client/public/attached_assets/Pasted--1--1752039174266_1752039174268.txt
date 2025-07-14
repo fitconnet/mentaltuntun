@@ -1,0 +1,128 @@
+🧭 전체 구조 설계 지침서: 일정 생성/삭제 로직 (주간/월간 반복 기준)
+🔍 1. 핵심 정의 정리
+항목	정의
+반복 유형	주간 또는 월간
+주간 반복	매주 특정 요일에 반복 (예: 매주 월·금)
+월간 반복	매월 특정 요일/날짜 기준 반복 (예: 매월 첫 번째 금요일 또는 매월 15일)
+반복 횟수	반복 생성 횟수 (0=무한 생성)
+삭제 기준	선택 일정 이후부터 삭제 OR 전체 삭제
+
+🧱 2. UI 구조 기준 데이터 모델
+ts
+복사
+편집
+interface RepeatSetting {
+  repeatType: 'weekly' | 'monthly';     // 주간 or 월간
+  interval: number;                     // 반복 간격 (1주, 2주, 1달 등)
+  weekdays?: number[];                 // 주간 반복 시 요일 (0: 일 ~ 6: 토)
+  monthlyMode?: 'weekday' | 'date';     // 월간 반복 기준 (요일 or 날짜)
+  repeatCount?: number;                 // 반복 횟수 (미입력 시 무한 반복)
+  baseDate: string;                     // 기준 시작일
+}
+📅 3. 일정 생성 로직: 주간 vs 월간
+✅ A. 주간 반복 로직
+ts
+복사
+편집
+function generateWeeklySchedules({ baseDate, interval, weekdays, repeatCount }) {
+  const schedules = []
+  const base = new Date(baseDate)
+  let count = 0
+  let currentWeekStart = new Date(base)
+
+  while (!repeatCount || count < repeatCount) {
+    weekdays.forEach((day) => {
+      const date = new Date(currentWeekStart)
+      date.setDate(date.getDate() + (day - date.getDay() + 7) % 7)
+      const key = date.toISOString().split('T')[0]
+      if (!schedules.find(d => d.date === key)) {
+        schedules.push({ date: key })
+      }
+    })
+    currentWeekStart.setDate(currentWeekStart.getDate() + 7 * interval)
+    count++
+  }
+
+  return schedules
+}
+✅ B. 월간 반복 로직
+ts
+복사
+편집
+function generateMonthlySchedules({ baseDate, interval, monthlyMode, weekdays, repeatCount }) {
+  const schedules = []
+  let current = new Date(baseDate)
+  let count = 0
+
+  while (!repeatCount || count < repeatCount) {
+    if (monthlyMode === 'date') {
+      const nextDate = new Date(current)
+      nextDate.setMonth(current.getMonth() + interval)
+      schedules.push({ date: nextDate.toISOString().split('T')[0] })
+    } else if (monthlyMode === 'weekday') {
+      weekdays.forEach((w) => {
+        const date = getNthWeekdayOfMonth(current.getFullYear(), current.getMonth(), w)
+        schedules.push({ date: date.toISOString().split('T')[0] })
+      })
+      current.setMonth(current.getMonth() + interval)
+    }
+    count++
+  }
+
+  return schedules
+}
+🔧 getNthWeekdayOfMonth()는 매월 n번째 요일을 계산하는 유틸 함수 필요.
+
+🗑️ 4. 일정 삭제 로직 지침
+💣 문제: 기준 날짜 이후 삭제 시 전체 삭제되는 현상
+✅ 해결 전략:
+모든 반복 일정에 groupId 부여
+
+삭제 시 다음 조건으로 필터링 적용
+
+ts
+복사
+편집
+DELETE /schedule?groupId=abc123&fromDate=2025-07-12
+ts
+복사
+편집
+// 필터 예시
+const filtered = allSchedules.filter(s => 
+  s.groupId === input.groupId && new Date(s.date) >= new Date(input.fromDate)
+)
+📌 5. 예외 방지 조건 로직
+상황	처리 로직
+기준일과 반복 요일 겹침	중복 제거 (Set 활용)
+반복 횟수 0	while(true) 형식으로 제한 없이 생성
+월말 31일 반복	매월 일수 체크하여 유효한 마지막 날짜로 보정
+
+📚 적용 예시
+▶ 사용자가 선택:
+기준일: 2025-07-12(금)
+
+반복 유형: 주간
+
+요일: 월, 금
+
+반복 횟수: 3회
+
+▶ 생성 결과:
+2025-07-12 (금) ← 기준일 1회
+
+2025-07-15 (월)
+
+2025-07-19 (금)
+
+2025-07-22 (월)
+
+2025-07-26 (금)
+
+🛡 중복 방지: 기준일과 요일이 겹치는 2025-07-12는 1회만 생성됨
+
+🧾 최종 요약
+기능	구조 설명
+📅 일정 생성	repeatType, interval, weekdays, monthlyMode, repeatCount 등 명확한 데이터 모델 정의
+🔁 반복 횟수	0이면 무한, 주간=주 단위 반복, 월간=월 단위 반복
+🧽 삭제 기능	groupId + fromDate 조합으로 이후만 삭제되도록 보정
+🛑 중복 방지	Set으로 날짜 중복 제거 / 기준일 체크

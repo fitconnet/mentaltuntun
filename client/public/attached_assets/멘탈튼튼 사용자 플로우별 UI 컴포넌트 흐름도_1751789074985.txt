@@ -1,0 +1,66 @@
+멘탈튼튼 사용자 플로우별 UI 컴포넌트 흐름도
+
+[1] 가입 및 초기 설정 플로우
+
+[회원가입 화면]
+ → ProfileForm (이름, 생년월일 등)
+ → 성향설정 선택: InterestCategoryGrid + KeywordCard (성향/관심사 선택)
+ → 완료 시 홈 이동
+
+[2] 홈 화면 플로우
+
+[Main/Home Screen]
+ → MainButtonCard (나는 누구?, 감정카드, 상담 시작)
+ → BottomTabBar (홈 / 캘린더 / 피드백 / 테스트 / 설정)
+
+[3] “나는 누구?” 탐색 플로우
+
+[나는 누구?]
+ → InterestCategoryGrid (8개 대분류)
+ → SubKeywordSelector (세부 키워드)
+ → WorldcupChoice (2개 카드 토너먼트)
+ → PersonaSuggestionBox (자아 요약 + 상담 추천)
+ → 선택 시 상담 연결
+
+[4] 감정 카드 플로우
+
+[감정 기록 시작]
+ → EmotionCategorySelector (긍정/부정 등)
+ → EmotionKeywordPicker (감정 키워드 선택)
+ → EmotionRecordCard (오늘 기록 저장)
+ → FeedbackGraph (주간/월간 분석 제공)
+
+[5] 상담 시작 플로우
+
+[상담 시작 화면]
+ → ConsultKeywordSelector (고민 주제 키워드 선택)
+ → PersonaRecommendationDynamic (GPT 상담 페르소나 3종 제안)
+ → 선택 시 ChatInterface 진입
+ → ChatInterface (GPT 말풍선 + 입력창 + 페르소나 표시)
+
+[6] 심리 테스트 플로우
+
+[테스트 선택 화면]
+ → TestCategoryToggle (전문 / 흥미 선택)
+ → TestCardGroup (소주제별 테스트 카드)
+ → TestQuestionPage (설문 진행)
+ → TestResultSummary (결과 요약 + 상담 연결)
+
+[7] 피드백 및 콘텐츠 탭 플로우
+
+[카테고리 탭 내 기능들]
+ → 캘린더: CalendarTracker + DailySummaryDialog
+ → 피드백: FeedbackGraph + InsightBox
+ → 콘텐츠: ContentPreviewCard + BookmarkButton
+ → 운세: FortuneCardGroup (일/월/연)
+
+[8] 관리자 플로우
+
+[Admin Login]
+ → AdminLoginForm
+ → Dashboard View 진입
+ → DashboardStatsCard (지표) + ContentUploadPanel + UserFeedbackList + RevenueGraph
+ → 설정: AdminSettingMenu (공지, 시스템 관리 등)
+
+※ 각 흐름은 컴포넌트 간 전환이 직관적으로 연결되며, 사용자 경험을 중심으로 최적화된 UI 흐름 설계를 따릅니다.
+
