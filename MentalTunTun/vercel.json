@@ -4,6 +4,7 @@
   "outputDirectory": "dist/public",
   "functions": {
     "api/index.ts": {
+      "runtime": "nodejs18.x",
       "maxDuration": 10
     }
   },
