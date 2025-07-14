@@ -1,10 +1,10 @@
-import * as express from 'express';
-import * as path from 'path';
-import * as cors from 'cors';
-import * as cookieParser from 'cookie-parser';
-import * as session from 'express-session';
-import { registerRoutes } from '../server/routes';
-import { firebaseInitialized } from '../server/firebase-admin';
+import express from 'express';
+import path from 'path';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
+// import { registerRoutes } from '../server/routes';
+// import { firebaseInitialized } from '../server/firebase-admin';
 import '../types/express-session';
 
 console.log("🎯 api/index.ts started - Function initialization");
@@ -142,7 +142,8 @@ if (missingOptionalEnvVars.length > 0) {
   console.warn('⚠️  Some additional features may not work properly');
 }
 
-// Firebase 초기화 상태 추가 체크
+// Firebase 초기화 상태 추가 체크 (임시로 비활성화)
+const firebaseInitialized = false; // 임시로 false로 설정
 console.log('🔧 Service initialization status:', {
   NODE_ENV: process.env.NODE_ENV,
   hasFirebase: !!process.env.FIREBASE_PROJECT_ID,
@@ -384,7 +385,8 @@ app.get('/api/public-test', (req, res) => {
   });
 });
 
-// API 라우터 등록 (안전한 방식)
+// API 라우터 등록 (임시로 주석 처리 - 디버깅용)
+/*
 try {
   console.log('🔧 Registering API routes...');
   registerRoutes(app);
@@ -405,6 +407,7 @@ try {
     });
   });
 }
+*/
 
 // 테스트 엔드포인트들을 registerRoutes 후에 재정의 (인증 우회)
 app.get('/health', (req, res) => {
