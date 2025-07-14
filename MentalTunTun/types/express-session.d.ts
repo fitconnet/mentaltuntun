@@ -7,6 +7,21 @@ declare module 'express-session' {
     isAdmin?: boolean;
     firebaseToken?: string;
     lastActivity?: Date;
+    admin?: {
+      userId: string;
+      email: string;
+      name: string;
+      role: string;
+    } | null;
+    user?: {
+      id: string;
+      uid: string;
+      email: string;
+      name: string;
+      [key: string]: any;
+    } | null;
+    adminId?: string;
+    adminTimestamp?: number;
   }
 }
 

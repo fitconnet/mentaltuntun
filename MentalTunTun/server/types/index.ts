@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { Session } from 'express-session';
 import { User } from '@shared/schema';
 
 // 세션 타입 정의
@@ -7,7 +8,7 @@ export interface SessionData {
   admin?: AdminUser;
   isAdmin?: boolean;
   adminId?: string;
-  adminTimestamp?: Date;
+  adminTimestamp?: number;
 }
 
 // Express 세션 타입 확장
@@ -17,28 +18,22 @@ declare module 'express-session' {
     admin?: AdminUser;
     isAdmin?: boolean;
     adminId?: string;
-    adminTimestamp?: Date;
+    adminTimestamp?: number;
   }
 }
 
-// Express Request 타입 확장
+// Express serve-static-core 모듈 확장
 declare module 'express-serve-static-core' {
   interface Request {
     user?: User;
-    session: Express.Session & Partial<SessionData>;
-    body: any;
-    params: any;
-    query: any;
+    session: Session & Partial<SessionData>;
   }
 }
 
 // Request 타입 확장
 export interface AuthenticatedRequest extends Request {
   user?: User;
-  session: Express.Session & Partial<SessionData>;
-  body: any;
-  params: any;
-  query: any;
+  session: Session & Partial<SessionData>;
 }
 
 // Admin 사용자 타입
@@ -51,6 +46,7 @@ export interface AdminUser {
   isSuperAdmin: boolean;
   createdAt: Date;
   updatedAt: Date;
+  userId: number; // 추가된 속성
 }
 
 // 피드백 스키마

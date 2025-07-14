@@ -288,6 +288,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         plan: "free",
         provider: "email",
         isAuthenticated: true,
+        mbti: "INFP",
+        interests: ["테스트", "개발"],
+        personality: { test: true },
+        birthDate: "1990-01-01",
+        occupation: "개발자",
+        gender: "기타",
+        subscriptionType: "free",
+        isActive: true,
+        subscriptionStartDate: new Date(),
+        subscriptionEndDate: null,
+        subscriptionCount: 0,
+        lastLogin: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        tempPremiumEndDate: null,
+        tempPremiumGrantedBy: null,
+        tempPremiumGrantedAt: null,
+        password: null,
       };
 
       // 세션에 저장
@@ -550,7 +568,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/logout", (req, res) => {
     // 관리자 세션과 일반 사용자 세션 모두 정리
     if (req.session?.admin) {
-      req.session.admin = null;
+      req.session.admin = undefined;
     }
 
     req.logout(err => {
@@ -709,8 +727,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // 세션에 관리자 정보와 사용자 ID 저장
         req.session.admin = {
           id: adminId,
+          adminId: adminUser.id.toString(),
           name: "Administrator",
+          email: adminUser.email,
           role: "admin",
+          isSuperAdmin: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
           userId: adminUser.id,
         };
 
@@ -4406,7 +4429,7 @@ ${weeklyData.withdrawalReasons.map(r => `- ${r.reason}: ${r.count}건`).join("\n
         const { adminId } = req.params;
         const { password, name } = req.body;
 
-        const updateData: any = {};
+        const updateData: Record<string, any> = {};
         if (password) updateData.password = password;
         if (name) updateData.name = name;
 
